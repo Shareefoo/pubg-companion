@@ -2,11 +2,10 @@ package com.shareefoo.pubgcompanion.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.shareefoo.pubgcompanion.R;
@@ -16,6 +15,8 @@ import com.shareefoo.pubgcompanion.provider.MatchContract;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -53,9 +54,11 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
         int id = mCursor.getInt(mCursor.getColumnIndex(MatchContract.MatchEntry._ID));
         int rank = mCursor.getInt(mCursor.getColumnIndex(MatchContract.MatchEntry.COLUMN_PLACEMENT));
+        int total = mCursor.getInt(mCursor.getColumnIndex(MatchContract.MatchEntry.COLUMN_TOTAL));
         int kills = mCursor.getInt(mCursor.getColumnIndex(MatchContract.MatchEntry.COLUMN_KILLS));
         double damage = mCursor.getDouble(mCursor.getColumnIndex(MatchContract.MatchEntry.COLUMN_DAMAGE));
         double distance = mCursor.getDouble(mCursor.getColumnIndex(MatchContract.MatchEntry.COLUMN_DISTANCE));
+        String mode = mCursor.getString(mCursor.getColumnIndex(MatchContract.MatchEntry.COLUMN_MODE));
 
         DecimalFormat df = new DecimalFormat("###.##");
 
@@ -71,10 +74,26 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
         // Set item views based on views and data model
         holder.textViewPlacements.setText(placement);
-        holder.textViewPlacementLabel.setText(R.string.teams_number);
+        holder.textViewTotal.setText("/" + total);
         holder.textViewKills.setText(String.valueOf(kills));
         holder.textViewDamage.setText(df.format(damage));
         holder.textViewDistance.setText(String.format("%s km", df.format(distance)));
+
+        switch (mode) {
+            case "solo":
+            case "solo-fpp":
+                holder.imageViewMode.setImageResource(R.drawable.mode_solo);
+                break;
+            case "duo":
+            case "duo-fpp":
+                holder.imageViewMode.setImageResource(R.drawable.mode_duo);
+                break;
+            case "squad":
+            case "squad-fpp":
+                holder.imageViewMode.setImageResource(R.drawable.mode_squad);
+                break;
+        }
+
     }
 
     @Override
@@ -99,8 +118,8 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         @BindView(R.id.textView_placement)
         TextView textViewPlacements;
 
-        @BindView(R.id.textView_placement_label)
-        TextView textViewPlacementLabel;
+        @BindView(R.id.textView_total)
+        TextView textViewTotal;
 
         @BindView(R.id.textView_kills)
         TextView textViewKills;
@@ -110,6 +129,9 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
         @BindView(R.id.textView_distance)
         TextView textViewDistance;
+
+        @BindView(R.id.imageView_mode)
+        ImageView imageViewMode;
 
         ViewHolder(View itemView) {
             super(itemView);

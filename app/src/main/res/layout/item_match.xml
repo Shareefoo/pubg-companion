@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -30,7 +30,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/textView_placement_label"
+            android:id="@+id/textView_total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/textView_placement"
@@ -45,8 +45,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/textView_placement_label"
-            android:layout_toRightOf="@id/textView_placement_label"
+            android:layout_toEndOf="@id/textView_total"
+            android:layout_toRightOf="@id/textView_total"
             android:gravity="center"
             android:text="@string/default_value"
             android:textSize="16sp"
@@ -58,8 +58,8 @@
             android:layout_below="@id/textView_kills"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/textView_placement_label"
-            android:layout_toRightOf="@id/textView_placement_label"
+            android:layout_toEndOf="@id/textView_total"
+            android:layout_toRightOf="@id/textView_total"
             android:gravity="center"
             android:text="@string/kills"
             android:textSize="14sp" />
@@ -136,4 +136,4 @@
 
     </RelativeLayout>
 
-</android.support.v7.widget.CardView>
+</androidx.cardview.widget.CardView>

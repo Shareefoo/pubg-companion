@@ -8,12 +8,13 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 
 import com.shareefoo.pubgcompanion.provider.MatchContract.MatchEntry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import androidx.annotation.NonNull;
 
 public class DBContentProvider extends ContentProvider {
 

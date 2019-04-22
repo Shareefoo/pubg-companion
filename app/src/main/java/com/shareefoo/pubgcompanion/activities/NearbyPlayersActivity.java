@@ -11,9 +11,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Looper;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -58,6 +55,9 @@ import com.shareefoo.pubgcompanion.model.map.PlayerLocation;
 import java.text.DateFormat;
 import java.util.Date;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
 import timber.log.Timber;
 
 public class NearbyPlayersActivity extends FragmentActivity implements OnMapReadyCallback {

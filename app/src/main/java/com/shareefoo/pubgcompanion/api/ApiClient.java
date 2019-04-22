@@ -1,7 +1,5 @@
 package com.shareefoo.pubgcompanion.api;
 
-import android.support.annotation.NonNull;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 

@@ -13,7 +13,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,15 +20,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".dialogs.PlayerNameDialogActivity"
             android:excludeFromRecents="true"
             android:theme="@style/DialogActivityTheme" />
-
         <activity
             android:name=".activities.NearbyPlayersActivity"
             android:label="@string/title_activity_nearby_friends" />
+
+        <activity android:name=".activities.FullMapActivity" />
 
         <provider
             android:name=".provider.DBContentProvider"
@@ -52,6 +51,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/GOOGLE_MAPS_API_KEY" />
 
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3194028862433939~1831163408"/>
+
         <receiver android:name=".widget.PUBGAppWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -62,6 +65,10 @@
                 android:resource="@xml/pubgapp_widget_info" />
         </receiver>
 
+        <activity
+            android:name=".HomeActivity"
+            android:label="@string/title_activity_home"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

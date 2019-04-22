@@ -25,9 +25,11 @@ public class DBHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_MATCHES_TABLE = "CREATE TABLE " + MatchEntry.TABLE_NAME + " (" +
                 MatchEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 MatchEntry.COLUMN_PLACEMENT + " INTEGER NOT NULL, " +
+                MatchEntry.COLUMN_TOTAL + " INTEGER NOT NULL, " +
                 MatchEntry.COLUMN_KILLS + " INTEGER NOT NULL, " +
                 MatchEntry.COLUMN_DAMAGE + " REAL NOT NULL, " +
-                MatchEntry.COLUMN_DISTANCE + " REAL Not NULL)";
+                MatchEntry.COLUMN_DISTANCE + " REAL NOT NULL, " +
+                MatchEntry.COLUMN_MODE + " TEXT NOT NULL)";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MATCHES_TABLE);
     }

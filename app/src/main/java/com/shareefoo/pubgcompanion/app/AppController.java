@@ -2,7 +2,6 @@ package com.shareefoo.pubgcompanion.app;
 
 
 import android.app.Application;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.shareefoo.pubgcompanion.BuildConfig;

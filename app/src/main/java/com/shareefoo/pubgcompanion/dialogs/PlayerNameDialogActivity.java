@@ -3,8 +3,7 @@ package com.shareefoo.pubgcompanion.dialogs;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -12,6 +11,8 @@ import android.widget.EditText;
 import com.shareefoo.pubgcompanion.R;
 import com.shareefoo.pubgcompanion.data.SpManager;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -33,10 +34,14 @@ public class PlayerNameDialogActivity extends AppCompatActivity {
     @OnClick(R.id.button_search)
     public void search(View view) {
         String playerName = editTextPlayerName.getText().toString();
-        Intent intent = new Intent();
-        intent.putExtra(SpManager.KEY_PLAYER_NAME, playerName);
-        setResult(RESULT_OK, intent);
-        finish();
+        if (!TextUtils.isEmpty(playerName)) {
+            Intent intent = new Intent();
+            intent.putExtra(SpManager.KEY_PLAYER_NAME, playerName);
+            setResult(RESULT_OK, intent);
+            finish();
+        } else {
+            editTextPlayerName.setError("Enter player name");
+        }
     }
 
 }

@@ -1,21 +1,16 @@
 package com.shareefoo.pubgcompanion.activities;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.shareefoo.pubgcompanion.R;
 import com.shareefoo.pubgcompanion.api.ApiClient;
 import com.shareefoo.pubgcompanion.api.ApiInterface;
@@ -23,7 +18,7 @@ import com.shareefoo.pubgcompanion.data.SpManager;
 import com.shareefoo.pubgcompanion.dialogs.PlayerNameDialogActivity;
 import com.shareefoo.pubgcompanion.fragments.MapsFragment;
 import com.shareefoo.pubgcompanion.fragments.MatchesFragment;
-import com.shareefoo.pubgcompanion.fragments.OverviewFragment;
+import com.shareefoo.pubgcompanion.fragments.StatsFragment;
 import com.shareefoo.pubgcompanion.model.CollectionPlayersResponse;
 import com.shareefoo.pubgcompanion.model.PlayerSeasonMatchesData;
 import com.shareefoo.pubgcompanion.utils.NetworkUtils;
@@ -32,6 +27,12 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -39,7 +40,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements OverviewFragment.OnMatchesDataLoad {
+public class MainActivity extends AppCompatActivity implements StatsFragment.OnMatchesDataLoad {
 
     private final int SEARCH_DIALOG_REQUEST_CODE = 100;
 
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
             fragment = getSupportFragmentManager().getFragment(savedInstanceState, KEY_CURRENT_FRAGMENT);
             loadFragment(fragment);
         } else {
-            fragment = new OverviewFragment();
+            fragment = new StatsFragment();
             loadFragment(fragment);
         }
 
@@ -86,8 +87,8 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_overview:
-                    fragment = new OverviewFragment();
+                case R.id.navigation_stats:
+                    fragment = new StatsFragment();
                     loadFragment(fragment);
                     return true;
 
@@ -180,7 +181,6 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SEARCH_DIALOG_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                //
                 String playerName = data.getStringExtra(SpManager.KEY_PLAYER_NAME);
                 getPlayerByNameRequest(playerName);
             }
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
                             spManager.putString(SpManager.KEY_PLAYER_ID, playerId);
                             spManager.putString(SpManager.KEY_PLAYER_NAME, playerName);
 
-                            OverviewFragment overviewFragment = new OverviewFragment();
+                            StatsFragment overviewFragment = new StatsFragment();
                             loadFragment(overviewFragment);
                         }
 

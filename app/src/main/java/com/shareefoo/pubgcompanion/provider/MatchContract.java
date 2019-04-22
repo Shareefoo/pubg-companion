@@ -22,9 +22,11 @@ public class MatchContract {
 
         public static final String TABLE_NAME = "matches";
         public static final String COLUMN_PLACEMENT = "placement";
+        public static final String COLUMN_TOTAL = "total";
         public static final String COLUMN_KILLS = "kills";
         public static final String COLUMN_DAMAGE = "damage";
         public static final String COLUMN_DISTANCE = "distance";
+        public static final String COLUMN_MODE = "mode";
     }
 
 }

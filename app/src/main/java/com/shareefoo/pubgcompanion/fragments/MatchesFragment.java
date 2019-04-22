@@ -6,15 +6,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +22,7 @@ import com.shareefoo.pubgcompanion.data.SpManager;
 import com.shareefoo.pubgcompanion.model.PlayerSeasonMatchesData;
 import com.shareefoo.pubgcompanion.model.match.AttributesStats;
 import com.shareefoo.pubgcompanion.model.match.MatchIncluded;
+import com.shareefoo.pubgcompanion.model.match.MatchRelationshipsData;
 import com.shareefoo.pubgcompanion.model.match.MatchResponse;
 import com.shareefoo.pubgcompanion.provider.MatchContract;
 import com.shareefoo.pubgcompanion.utils.NetworkUtils;
@@ -41,6 +33,15 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -147,7 +148,7 @@ public class MatchesFragment extends Fragment implements LoaderManager.LoaderCal
                     matchResponseCall.enqueue(new Callback<MatchResponse>() {
                         @Override
                         public void onResponse(@NonNull Call<MatchResponse> call, @NonNull Response<MatchResponse> response) {
-                            Timber.d("onResponse: " + response.toString());
+                            Timber.d("onResponse: %s", response.toString());
 //                            progressBar.setVisibility(View.INVISIBLE);
 
                             if (response.isSuccessful()) {
@@ -155,6 +156,11 @@ public class MatchesFragment extends Fragment implements LoaderManager.LoaderCal
                                 MatchResponse matchResponse = response.body();
 
                                 if (matchResponse != null) {
+
+                                    String gameMode = matchResponse.getData().getAttributes().getGameMode();
+
+                                    List<MatchRelationshipsData> data = matchResponse.getData().getRelationships().getRosters().getData();
+                                    int total = data.size();
 
                                     List<MatchIncluded> included = matchResponse.getIncluded();
 
@@ -180,9 +186,11 @@ public class MatchesFragment extends Fragment implements LoaderManager.LoaderCal
                                                     statsList.add(stats);
 
                                                     new InsertDataTask().execute(String.valueOf(placement),
+                                                            String.valueOf(total),
                                                             String.valueOf(kills),
                                                             String.valueOf(damage),
-                                                            String.valueOf(distance));
+                                                            String.valueOf(distance),
+                                                            gameMode);
                                                 }
 
                                             }
@@ -260,16 +268,20 @@ public class MatchesFragment extends Fragment implements LoaderManager.LoaderCal
         protected Void doInBackground(String... strings) {
 
             int placement = Integer.parseInt(strings[0]);
-            int kills = Integer.parseInt(strings[1]);
-            double damage = Double.parseDouble(strings[2]);
-            double distance = Double.parseDouble(strings[3]);
+            int total = Integer.parseInt(strings[1]);
+            int kills = Integer.parseInt(strings[2]);
+            double damage = Double.parseDouble(strings[3]);
+            double distance = Double.parseDouble(strings[4]);
+            String mode = strings[5];
 
             // Insert new match into DB
             ContentValues contentValues = new ContentValues();
             contentValues.put(MatchContract.MatchEntry.COLUMN_PLACEMENT, placement);
+            contentValues.put(MatchContract.MatchEntry.COLUMN_TOTAL, total);
             contentValues.put(MatchContract.MatchEntry.COLUMN_KILLS, kills);
             contentValues.put(MatchContract.MatchEntry.COLUMN_DAMAGE, damage);
             contentValues.put(MatchContract.MatchEntry.COLUMN_DISTANCE, distance);
+            contentValues.put(MatchContract.MatchEntry.COLUMN_MODE, mode);
             getActivity().getContentResolver().insert(MatchContract.MatchEntry.CONTENT_URI, contentValues);
 
             return null;

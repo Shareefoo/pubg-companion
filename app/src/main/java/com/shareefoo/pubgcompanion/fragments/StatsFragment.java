@@ -1,14 +1,13 @@
 package com.shareefoo.pubgcompanion.fragments;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,6 +51,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -60,7 +61,7 @@ import retrofit2.Response;
 import timber.log.Timber;
 
 
-public class OverviewFragment extends Fragment {
+public class StatsFragment extends Fragment {
 
     @BindView(R.id.textView_playerName)
     TextView textViewPlayerName;
@@ -102,13 +103,15 @@ public class OverviewFragment extends Fragment {
     private double kd;
     private double dmg;
 
+    private ProgressDialog progressDialog;
+
 //    private static final String KEY_GAMES = "key_games";
 //    private static final String KEY_WINS = "key_wins";
 //    private static final String KEY_TOP10 = "key_top10";
 //    private static final String KEY_KD = "key_kd";
 //    private static final String KEY_DMG = "key_dmg";
 
-    public OverviewFragment() {
+    public StatsFragment() {
         // Required empty public constructor
     }
 
@@ -118,10 +121,10 @@ public class OverviewFragment extends Fragment {
 //     *
 //     * @param playerId   Id of the player.
 //     * @param playerName name of the player.
-//     * @return A new instance of fragment OverviewFragment.
+//     * @return A new instance of fragment StatsFragment.
 //     */
-//    public static OverviewFragment newInstance(String playerId, String playerName) {
-//        OverviewFragment fragment = new OverviewFragment();
+//    public static StatsFragment newInstance(String playerId, String playerName) {
+//        StatsFragment fragment = new StatsFragment();
 //        Bundle args = new Bundle();
 //        args.putString(ARG_PLAYER_ID, playerId);
 //        args.putString(ARG_PLAYER_NAME, playerName);
@@ -154,6 +157,10 @@ public class OverviewFragment extends Fragment {
 
         spManager = SpManager.getInstance(getContext());
 
+        //
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Loading...");
+
         mPlayerId = spManager.getString(SpManager.KEY_PLAYER_ID, "");
         mPlayerName = spManager.getString(SpManager.KEY_PLAYER_NAME, "");
 
@@ -177,10 +184,10 @@ public class OverviewFragment extends Fragment {
 //
 //            } else {
 
-                spinnerModes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        String mode = adapterView.getSelectedItem().toString();
+            spinnerModes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    String mode = adapterView.getSelectedItem().toString();
 
 //                    String mode;
 //
@@ -192,14 +199,14 @@ public class OverviewFragment extends Fragment {
 //
 //                    spManager.putString("game_mode", mode);
 
-                        getSeasons(mode);
-                    }
+                    getSeasons(mode);
+                }
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-
-                    }
-                });
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                    //
+                }
+            });
 
 //            }
 
@@ -211,7 +218,14 @@ public class OverviewFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * This method will inflate the season spinner
+     *
+     * @param mode game mode
+     */
     private void getSeasons(final String mode) {
+        //
+        progressDialog.show();
         //
         if (NetworkUtils.IsNetworkAvailable(getContext())) {
             ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
@@ -220,6 +234,9 @@ public class OverviewFragment extends Fragment {
                 @Override
                 public void onResponse(@NonNull Call<SeasonResponse> call, @NonNull Response<SeasonResponse> response) {
                     Timber.d("onResponse: %s", response.toString());
+
+                    //
+                    progressDialog.dismiss();
 
                     if (response.isSuccessful()) {
 
@@ -241,8 +258,7 @@ public class OverviewFragment extends Fragment {
 
                             Collections.reverse(seasonDataList);
 
-                            ArrayAdapter<String> seasonsAdapter = new ArrayAdapter<String>(getContext(),
-                                    R.layout.simple_spinner_item, seasonsNames);
+                            ArrayAdapter<String> seasonsAdapter = new ArrayAdapter<String>(getContext(), R.layout.simple_spinner_item, seasonsNames);
                             seasonsAdapter.setDropDownViewResource(R.layout.simple_spinner_item);
 
                             spinnerSeasons.setAdapter(seasonsAdapter);
@@ -259,6 +275,7 @@ public class OverviewFragment extends Fragment {
                                         }
                                     }
 
+                                    //
                                     getPlayerSeason(mPlayerId, seasonsId, mode);
                                 }
 
@@ -283,6 +300,9 @@ public class OverviewFragment extends Fragment {
                 @Override
                 public void onFailure(@NonNull Call<SeasonResponse> call, @NonNull Throwable t) {
                     Timber.d("onFailure: %s", t.getMessage());
+
+                    //
+                    progressDialog.dismiss();
                 }
             });
         } else {
@@ -290,13 +310,26 @@ public class OverviewFragment extends Fragment {
         }
     }
 
+    /**
+     * This methods will get player stats in the selected season and mode
+     *
+     * @param playerId player id
+     * @param seasonId season id
+     * @param mode     game mode
+     */
     private void getPlayerSeason(String playerId, String seasonId, final String mode) {
+        //
+        progressDialog.show();
+
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
         Call<PlayerSeasonResponse> playerSeasonResponseCall = apiService.getPlayerSeason(playerId, seasonId);
         playerSeasonResponseCall.enqueue(new Callback<PlayerSeasonResponse>() {
             @Override
             public void onResponse(@NonNull Call<PlayerSeasonResponse> call, @NonNull Response<PlayerSeasonResponse> response) {
                 Timber.d("onResponse: %s", response.toString());
+
+                //
+                progressDialog.dismiss();
 
                 if (response.isSuccessful()) {
 
@@ -311,7 +344,7 @@ public class OverviewFragment extends Fragment {
                         if (mode.equals("Solo")) {
                             Solo solo = playerSeasonResponse.getPlayerSeasonData().getAttributes().getGameModeStats().getSolo();
 
-                            games = solo.getWins() + solo.getLosses();
+                            games = solo.getRoundsPlayed();
                             wins = solo.getWins();
                             top10 = solo.getTop10s();
                             kd = solo.getKills() / (1 + solo.getLosses());
@@ -325,7 +358,7 @@ public class OverviewFragment extends Fragment {
                         } else if (mode.equals("Solo FPP")) {
                             SoloFpp soloFpp = playerSeasonResponse.getPlayerSeasonData().getAttributes().getGameModeStats().getSoloFpp();
 
-                            games = soloFpp.getWins() + soloFpp.getLosses();
+                            games = soloFpp.getRoundsPlayed();
                             wins = soloFpp.getWins();
                             top10 = soloFpp.getTop10s();
                             kd = soloFpp.getKills() / (1 + soloFpp.getLosses());
@@ -339,7 +372,7 @@ public class OverviewFragment extends Fragment {
                         } else if (mode.equals("Duo")) {
                             Duo duo = playerSeasonResponse.getPlayerSeasonData().getAttributes().getGameModeStats().getDuo();
 
-                            games = duo.getWins() + duo.getLosses();
+                            games = duo.getRoundsPlayed();
                             wins = duo.getWins();
                             top10 = duo.getTop10s();
                             kd = duo.getKills() / (1 + duo.getLosses());
@@ -353,7 +386,7 @@ public class OverviewFragment extends Fragment {
                         } else if (mode.equals("Duo FPP")) {
                             DuoFpp duoFpp = playerSeasonResponse.getPlayerSeasonData().getAttributes().getGameModeStats().getDuoFpp();
 
-                            games = duoFpp.getWins() + duoFpp.getLosses();
+                            games = duoFpp.getRoundsPlayed();
                             wins = duoFpp.getWins();
                             top10 = duoFpp.getTop10s();
                             kd = duoFpp.getKills() / (1 + duoFpp.getLosses());
@@ -367,7 +400,7 @@ public class OverviewFragment extends Fragment {
                         } else if (mode.equals("Squad")) {
                             Squad squad = playerSeasonResponse.getPlayerSeasonData().getAttributes().getGameModeStats().getSquad();
 
-                            games = squad.getWins() + squad.getLosses();
+                            games = squad.getRoundsPlayed();
                             wins = squad.getWins();
                             top10 = squad.getTop10s();
                             kd = squad.getKills() / (1 + squad.getLosses());
@@ -381,7 +414,7 @@ public class OverviewFragment extends Fragment {
                         } else if (mode.equals("Squad FPP")) {
                             SquadFpp squadFpp = playerSeasonResponse.getPlayerSeasonData().getAttributes().getGameModeStats().getSquadFpp();
 
-                            games = squadFpp.getWins() + squadFpp.getLosses();
+                            games = squadFpp.getRoundsPlayed();
                             wins = squadFpp.getWins();
                             top10 = squadFpp.getTop10s();
                             kd = squadFpp.getKills() / (1 + squadFpp.getLosses());
@@ -433,6 +466,9 @@ public class OverviewFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<PlayerSeasonResponse> call, @NonNull Throwable t) {
                 Timber.e("onFailure: %s", t.getMessage());
+
+                //
+                progressDialog.dismiss();
             }
         });
     }
